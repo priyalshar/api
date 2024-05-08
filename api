@@ -1,0 +1,53 @@
+**index.js
+const dbConnect=require('./mongodb')
+const express=require('express');
+const app=express();
+app.use(express.json)
+
+//get API
+
+app.get('/getData',async(req,re)=>{
+let result=await dbConnect();
+result=await result.find().toArray();
+result.send(result);
+})
+
+//post API
+app.post('/insertData',async(req,res)=>{
+    let result=await dbConnect();
+    result=await result.insertOne(req.body);
+    res.send("Data Inserted Successfully")
+})
+
+//PUT API
+app.put('/update data/:name',async(req,res)=>{
+    let result=await dbConnect();
+    result=await result.updateOne({nmae:req.params.name},{$set:req.body});
+    res.send("data Updated successfully");
+
+})
+
+//DELETE API
+app.delete('/delete data/:name',async(req,res)=>{
+    let result=await dbConnect();
+    result=await result.deleteOne({nmae:req.params.name})
+    res.send("data deleted successfully");
+})
+app.listen(3000);
+
+
+***mongodb.js
+const { MongoClient } = require("mongodb")
+
+const url="mongodb://localhost:27017"
+const database='student';
+const client=new MongoClient(url);
+
+const dbConnect=async()=>{
+    const result=await client.connect();
+    const db=await result.db(database);
+    return db.collection('profile');
+
+}
+
+module.exports=dbConnect;
